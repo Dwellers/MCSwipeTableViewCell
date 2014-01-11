@@ -276,15 +276,8 @@ secondStateIconName:(NSString *)secondIconName
         _colorIndicatorView.backgroundColor = self.defaultColor;
         
     } completion:^(BOOL finished1) { //go back to finish
-        
         [UIView animateWithDuration:kMCBounceDuration2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-//            CGPoint center = self.contentView.center;
-//            center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
-//            [self.contentView setCenter:center];
-            
-            // Clearing the indicator view
             _colorIndicatorView.backgroundColor = [UIColor clearColor];
-            
         } completion:^(BOOL finished2) {
             if (completion) {
                 completion();
@@ -478,9 +471,10 @@ secondStateIconName:(NSString *)secondIconName
         subview = _thirdSubview;
     else if (percentage <= -_secondTrigger)
         subview = _fourthSubview;
-    
-//    if (self.mode == MCSwipeTableViewCellModeDwellers)
-//        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    else {
+        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        //_colorIndicatorView
+    }
     
     return subview;
 }
