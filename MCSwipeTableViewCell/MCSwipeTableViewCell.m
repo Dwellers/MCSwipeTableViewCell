@@ -268,9 +268,9 @@ secondStateIconName:(NSString *)secondIconName
     CGFloat bounceDistance = kMCBounceAmplitude * _currentPercentage;
     
     [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
-        CGRect frame = self.contentView.frame;
-        frame.origin.x = -bounceDistance;
-        [self.contentView setFrame:frame];
+        CGPoint center = self.contentView.center;
+        center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
+        [self.contentView setCenter:center];
         
         [_slidingImageView setAlpha:0.0];
         [self slideImageWithPercentage:0 imageName:_currentImageName isDragging:NO];
@@ -278,12 +278,12 @@ secondStateIconName:(NSString *)secondIconName
         // Setting back the color to the default
         _colorIndicatorView.backgroundColor = self.defaultColor;
         
-    } completion:^(BOOL finished1) {
+    } completion:^(BOOL finished1) { //go back to finish
         
         [UIView animateWithDuration:kMCBounceDuration2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            CGPoint center = self.contentView.center;
-            center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
-            [self.contentView setCenter:center];
+//            CGPoint center = self.contentView.center;
+//            center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
+//            [self.contentView setCenter:center];
             
             // Clearing the indicator view
             _colorIndicatorView.backgroundColor = [UIColor clearColor];
