@@ -252,9 +252,12 @@ secondStateIconName:(NSString *)secondIconName
         if (cellMode == MCSwipeTableViewCellModeExit && _direction != MCSwipeTableViewCellDirectionCenter && [self validateState:cellState]) {
             [self moveWithDuration:animationDuration andDirection:_direction];
         } else if (cellMode == MCSwipeTableViewCellModeDwellers) {
-            NSLog(@"Content frame start: %f\n",self.contentView.frame.origin.x);
             if (self.contentView.frame.origin.x == -200.0) {
                 NSLog(@"Content frame start: %f\n",self.contentView.frame.origin.x);
+                // not allowed to swipe left
+                if (translation.x < 0) {
+                    [self moveToOrigin];
+                }
             } else {
                 [self moveToOrigin];
             }
@@ -265,8 +268,6 @@ secondStateIconName:(NSString *)secondIconName
 }
 
 - (void)retractWithCompletion:(void(^)(void))completion {
-    CGFloat bounceDistance = kMCBounceAmplitude * _currentPercentage;
-    
     [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
         CGPoint center = self.contentView.center;
         center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
@@ -482,8 +483,8 @@ secondStateIconName:(NSString *)secondIconName
     else if (percentage <= -_secondTrigger)
         subview = _fourthSubview;
     
-    if (self.mode == MCSwipeTableViewCellModeDwellers)
-        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+//    if (self.mode == MCSwipeTableViewCellModeDwellers)
+//        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
     return subview;
 }
