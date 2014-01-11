@@ -201,9 +201,15 @@ secondStateIconName:(NSString *)secondIconName
                 [self.contentView setCenter:center];
             } else if (translation.x < 0 && distFromRightEdge < kMCStop1*self.contentView.frame.size.width) {
                 [self.contentView setCenter:center];
-            } else if (translation.x < 0 && distFromRightEdge > kMCStop1*self.contentView.frame.size.width) {
-                center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
-                [self.contentView setCenter:center];
+            } else if (translation.x < 0 && distFromRightEdge > kMCStop1*self.contentView.frame.size.width) { //retract to show entire view
+                //center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
+                //[self.contentView setCenter:center];
+                
+                __weak MCSwipeTableViewCell *weakSelf = self;
+                [self retractWithCompletion:^{
+                    __strong MCSwipeTableViewCell *strongSelf = weakSelf;
+                    [strongSelf notifyDelegate];
+                }];
             }
         } else {
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
@@ -257,6 +263,39 @@ secondStateIconName:(NSString *)secondIconName
         }
     }
 }
+
+- (void)retractWithCompletion:(void(^)(void))completion {
+    CGFloat bounceDistance = kMCBounceAmplitude * _currentPercentage;
+    
+    [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
+        CGRect frame = self.contentView.frame;
+        frame.origin.x = -bounceDistance;
+        [self.contentView setFrame:frame];
+        
+        [_slidingImageView setAlpha:0.0];
+        [self slideImageWithPercentage:0 imageName:_currentImageName isDragging:NO];
+        
+        // Setting back the color to the default
+        _colorIndicatorView.backgroundColor = self.defaultColor;
+        
+    } completion:^(BOOL finished1) {
+        
+        [UIView animateWithDuration:kMCBounceDuration2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            CGPoint center = self.contentView.center;
+            center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
+            [self.contentView setCenter:center];
+            
+            // Clearing the indicator view
+            _colorIndicatorView.backgroundColor = [UIColor clearColor];
+            
+        } completion:^(BOOL finished2) {
+            if (completion) {
+                completion();
+            }
+        }];
+    }];
+}
+
 
 - (void)moveToOrigin {
     __weak MCSwipeTableViewCell *weakSelf = self;
