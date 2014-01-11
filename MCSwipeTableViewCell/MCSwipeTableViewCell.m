@@ -202,9 +202,6 @@ secondStateIconName:(NSString *)secondIconName
             } else if (translation.x < 0 && distFromRightEdge < kMCStop1*self.contentView.frame.size.width) {
                 [self.contentView setCenter:center];
             } else if (translation.x < 0 && distFromRightEdge > kMCStop1*self.contentView.frame.size.width) { //retract to show entire view
-                //center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
-                //[self.contentView setCenter:center];
-                
                 __weak MCSwipeTableViewCell *weakSelf = self;
                 [self retractWithCompletion:^{
                     __strong MCSwipeTableViewCell *strongSelf = weakSelf;
@@ -253,7 +250,6 @@ secondStateIconName:(NSString *)secondIconName
             [self moveWithDuration:animationDuration andDirection:_direction];
         } else if (cellMode == MCSwipeTableViewCellModeDwellers) {
             if (self.contentView.frame.origin.x == -200.0) {
-                NSLog(@"Content frame start: %f\n",self.contentView.frame.origin.x);
                 // not allowed to swipe left
                 if (translation.x < 0) {
                     [self moveToOrigin];
