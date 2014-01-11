@@ -473,7 +473,6 @@ secondStateIconName:(NSString *)secondIconName
         subview = _fourthSubview;
     else {
         [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        //_colorIndicatorView
     }
     
     return subview;
