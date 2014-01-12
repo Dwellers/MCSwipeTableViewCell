@@ -199,8 +199,10 @@ secondStateIconName:(NSString *)secondIconName
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
             if (distFromLeftEdge < _firstSubview.bounds.size.width && translation.x > 0) {
                 [self.contentView setCenter:center];
-            } else if (translation.x < 0 && distFromRightEdge <= _thirdSubview.frame.size.width) {
+            } else if (translation.x < 0 && distFromRightEdge < _thirdSubview.frame.size.width) {
                 [self.contentView setCenter:center];
+            } else if (translation.x > 0 && distFromRightEdge == _thirdSubview.frame.size.width) {
+                [self moveToOrigin];
             }
         } else {
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
@@ -245,15 +247,8 @@ secondStateIconName:(NSString *)secondIconName
         } else if (cellMode == MCSwipeTableViewCellModeDwellers) {
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
-            NSLog(@"distFromRightEdge");
             
-            if (self.contentView.frame.origin.x == -200.0) {
-                // not allowed to swipe left
-                if (translation.x < 0) {
-                    [self moveToOrigin];
-                }
-            } else if (distFromRightEdge > kMCStop1*self.contentView.frame.size.width && distFromRightEdge < 200.0) { //retract
-                NSLog(@"lol");
+            if (distFromRightEdge > kMCStop1*self.contentView.frame.size.width && distFromRightEdge < 200.0) { //retract
                 __weak MCSwipeTableViewCell *weakSelf = self;
                                 [self retractWithCompletion:^{
                                     __strong MCSwipeTableViewCell *strongSelf = weakSelf;
