@@ -22,9 +22,12 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
 @property (nonatomic, assign) CGFloat currentPercentage;
 
 @property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
+@property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 @property (nonatomic, strong) UIImageView *slidingImageView;
 @property (nonatomic, strong) NSString *currentImageName;
 @property (nonatomic, strong) UIView *colorIndicatorView;
+
+
 
 @end
 
@@ -115,6 +118,9 @@ secondStateIconName:(NSString *)secondIconName
     _modeForState2 = MCSwipeTableViewCellModeNone;
     _modeForState3 = MCSwipeTableViewCellModeNone;
     _modeForState4 = MCSwipeTableViewCellModeNone;
+    
+    //num swipes count (for dwellers use)
+    _numSwipes = 0;
 }
 
 #pragma mark - Setter
@@ -157,7 +163,11 @@ secondStateIconName:(NSString *)secondIconName
     _modeForState2 = MCSwipeTableViewCellModeNone;
     _modeForState3 = MCSwipeTableViewCellModeNone;
     _modeForState4 = MCSwipeTableViewCellModeNone;
+    
+    _numSwipes = 0;
 }
+
+
 
 #pragma mark - Handle Gestures
 
@@ -166,10 +176,13 @@ secondStateIconName:(NSString *)secondIconName
     // The user does not want you to be dragged!
     if (!_shouldDrag) return;
     
+    // NSLog(@"HELLO WORLD!");
+    
     UIGestureRecognizerState state = [gesture state];
     CGPoint translation = [gesture translationInView:self];
     CGPoint velocity = [gesture velocityInView:self];
     CGFloat percentage = [self percentageWithOffset:CGRectGetMinX(self.contentView.frame) relativeToWidth:CGRectGetWidth(self.bounds)];
+    
     NSTimeInterval animationDuration = [self animationDurationWithVelocity:velocity];
     _direction = [self directionWithPercentage:percentage];
     
@@ -211,20 +224,29 @@ secondStateIconName:(NSString *)secondIconName
             cellMode = self.mode;
         }
         
-        if (cellMode == MCSwipeTableViewCellModeExit && _direction != MCSwipeTableViewCellDirectionCenter && [self validateState:cellState]) {
+        if (cellMode == MSSwipeTableViewCellModeDwellers) {
+            if (velocity.x < 0 && percentage > -_firstTrigger) { //swing back if before first trigger
+                [self swingCellBack];
+            } else if (_direction == MCSwipeTableViewCellDirectionRight || velocity.x > 0) {
+                [self swingCellBack];
+            }
+        } else if (cellMode == MCSwipeTableViewCellModeExit && _direction != MCSwipeTableViewCellDirectionCenter && [self validateState:cellState]) {
             [self moveWithDuration:animationDuration andDirection:_direction];
-        }
-        
-        else {
-            
-            __weak MCSwipeTableViewCell *weakSelf = self;
-            [self swipeToOriginWithCompletion:^{
-                __strong MCSwipeTableViewCell *strongSelf = weakSelf;
-                [strongSelf notifyDelegate];
-            }];
+        } else if (cellMode != MSSwipeTableViewCellModeDwellers){ // makes the cell swing back in place
+            [self swingCellBack];
         }
     }
 }
+
+#pragma mark - Swings the cell back in position when called
+-(void) swingCellBack {
+    __weak MCSwipeTableViewCell *weakSelf = self;
+    [self swipeToOriginWithCompletion:^{
+        __strong MCSwipeTableViewCell *strongSelf = weakSelf;
+        [strongSelf notifyDelegate];
+    }];
+}
+
 
 #pragma mark - UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
