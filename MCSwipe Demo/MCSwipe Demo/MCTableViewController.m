@@ -10,6 +10,7 @@
 #import "MCTableViewController.h"
 
 static NSUInteger const kMCNumItems = 10;
+
 static CGFloat const TABLE_CELL_HEIGHT = 50;
 
 static CGFloat const FIRST_VIEW_WIDTH = 200;
@@ -68,19 +69,6 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
     
     CGSize tableViewCellSize = cell.contentView.bounds.size;
     
-    // add some views to test on
-    UIView *firstView = [[UIView alloc] initWithFrame:CGRectMake(0,0,FIRST_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [firstView setBackgroundColor:[UIColor purpleColor]];
-    
-    UIView *secondView = [[UIView alloc] initWithFrame:CGRectMake(0,0,SECOND_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [secondView setBackgroundColor:[UIColor orangeColor]];
-    
-    UIView *thirdView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-THIRD_VIEW_WIDTH,0,THIRD_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [thirdView setBackgroundColor:[UIColor cyanColor]];
-    
-    UIView *fourthView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-FOURTH_VIEW_WIDTH,0,FOURTH_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [fourthView setBackgroundColor:[UIColor blackColor]];
-    
     [cell setDelegate:self];
     [cell setFirstStateIconName:@"check.png"
                      firstColor:[UIColor colorWithRed:85.0 / 255.0 green:213.0 / 255.0 blue:80.0 / 255.0 alpha:1.0]
@@ -95,14 +83,28 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
                     fourthColor:[UIColor colorWithRed:206.0 / 255.0 green:149.0 / 255.0 blue:98.0 / 255.0 alpha:1.0]
                      fourthView:nil];
     
+    // add some views to test on
+    UIView *firstView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, FIRST_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
+    [firstView setBackgroundColor:[UIColor purpleColor]];
+    
+    UIView *secondView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SECOND_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
+    [secondView setBackgroundColor:[UIColor orangeColor]];
+    
+    UIView *thirdView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-THIRD_VIEW_WIDTH,0,THIRD_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
+    [thirdView setBackgroundColor:[UIColor cyanColor]];
+    
+    UIView *fourthView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-FOURTH_VIEW_WIDTH,0,FOURTH_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
+    [fourthView setBackgroundColor:[UIColor blackColor]];
+    
     [cell.contentView setBackgroundColor:[UIColor whiteColor]];
     cell.separatorInset = UIEdgeInsetsZero;
     
     // Setting the default inactive state color to the tableView background color
     [cell setDefaultColor:self.tableView.backgroundView.backgroundColor];
     
+    //
     [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
-
+    
     if (indexPath.row % kMCNumItems == 0) {
         [cell.textLabel setText:@"Switch Mode Cell"];
         [cell.detailTextLabel setText:@"Swipe to switch"];
@@ -203,21 +205,22 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
     
     else if (indexPath.row % kMCNumItems == 9) {
         [cell.textLabel setText:@"Dwellers"];
-        [cell.detailTextLabel setText:@"Left swings back; right stays till dismissal"];
-        cell.mode = MSSwipeTableViewCellModeDwellers;
-        //[cell.contentView setBackgroundColor:[UIColor yellowColor]];
+        [cell.detailTextLabel setText:@"Swipe left returns, right retracts"];
+        cell.mode = MCSwipeTableViewCellModeDwellers;
+        //cell.mode = MCSwipeTableViewCellModeSwitch;
+        
         [cell setFirstStateIconName:nil
                          firstColor:nil
                           firstView:firstView
                 secondStateIconName:nil
                         secondColor:nil
-                         secondView:secondView
+                         secondView:nil
                       thirdIconName:nil
                          thirdColor:nil
                           thirdView:thirdView
                      fourthIconName:nil
                         fourthColor:nil
-                         fourthView:fourthView];
+                         fourthView:nil];
     }
     
     return cell;
