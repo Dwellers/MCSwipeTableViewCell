@@ -28,7 +28,7 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
     MCSwipeTableViewCellModeNone = 0,
     MCSwipeTableViewCellModeExit,
     MCSwipeTableViewCellModeSwitch,
-    MSSwipeTableViewCellModeDwellers
+    MCSwipeTableViewCellModeDwellers
 };
 
 @protocol MCSwipeTableViewCellDelegate <NSObject>
@@ -63,6 +63,11 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
 @property (nonatomic, strong) UIColor *thirdColor;
 @property (nonatomic, strong) UIColor *fourthColor;
 
+@property (nonatomic, strong) UIView *firstSubview;
+@property (nonatomic, strong) UIView *secondSubview;
+@property (nonatomic, strong) UIView *thirdSubview;
+@property (nonatomic, strong) UIView *fourthSubview;
+
 // Percentage of when the first and second action are activated, respectively
 @property (nonatomic, assign) CGFloat firstTrigger;
 @property (nonatomic, assign) CGFloat secondTrigger;
@@ -83,12 +88,6 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
 @property (nonatomic, assign) BOOL isDragging;
 @property (nonatomic, assign) BOOL shouldDrag;
 @property (nonatomic, assign) BOOL shouldAnimatesIcons;
-
-// subviews so you can add a view to the things
-@property (nonatomic, strong) UIView *firstView;
-@property (nonatomic, strong) UIView *secondView;
-@property (nonatomic, strong) UIView *thirdView;
-@property (nonatomic, strong) UIView *fourthView;
 
 - (id)initWithStyle:(UITableViewCellStyle)style
     reuseIdentifier:(NSString *)reuseIdentifier
