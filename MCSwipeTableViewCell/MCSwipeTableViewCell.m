@@ -192,6 +192,7 @@ secondStateIconName:(NSString *)secondIconName
     
     if (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
         _isDragging = YES;
+        NSLog(@"translation: %f",translation.x);
         
         if (self.mode == MCSwipeTableViewCellModeDwellers) {//dwellers: can move only as much as the subview allow
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
@@ -199,9 +200,11 @@ secondStateIconName:(NSString *)secondIconName
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
             if (distFromLeftEdge < _firstSubview.bounds.size.width && translation.x > 0) {
                 [self.contentView setCenter:center];
-            } else if (translation.x < 0 && distFromRightEdge < _thirdSubview.frame.size.width) {
+            } else if (translation.x < 0 && distFromRightEdge < _thirdSubview.frame.size.width) { //first 25% from right
                 [self.contentView setCenter:center];
-            } else if (translation.x > 0 && distFromRightEdge == _thirdSubview.frame.size.width) {
+            }
+            
+            if (translation.x > 0 && distFromRightEdge > kMCStop1*self.contentView.frame.size.width) {
                 [self moveToOrigin];
             }
         } else {
@@ -248,7 +251,7 @@ secondStateIconName:(NSString *)secondIconName
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
             
-            if (distFromRightEdge > kMCStop1*self.contentView.frame.size.width && distFromRightEdge < 200.0) { //retract
+            if (distFromRightEdge > kMCStop1*self.contentView.frame.size.width && distFromRightEdge < _thirdSubview.frame.size.width) { //retract
                 __weak MCSwipeTableViewCell *weakSelf = self;
                                 [self retractWithCompletion:^{
                                     __strong MCSwipeTableViewCell *strongSelf = weakSelf;
