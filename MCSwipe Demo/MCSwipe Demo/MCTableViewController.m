@@ -15,7 +15,7 @@ static CGFloat const TABLE_CELL_HEIGHT = 50;
 
 static CGFloat const FIRST_VIEW_WIDTH = 200;
 static CGFloat const SECOND_VIEW_WIDTH = 300;
-static CGFloat const THIRD_VIEW_WIDTH = 200;
+static CGFloat const THIRD_VIEW_WIDTH = 100;
 static CGFloat const FOURTH_VIEW_WIDTH = 300;
 
 @interface MCTableViewController () <MCSwipeTableViewCellDelegate, UIAlertViewDelegate>
@@ -204,6 +204,7 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
     }
     
     else if (indexPath.row % kMCNumItems == 9) {
+        
         [cell.textLabel setText:@"Dwellers"];
         [cell.detailTextLabel setText:@"Swipe left returns, right retracts"];
         cell.mode = MCSwipeTableViewCellModeDwellers;
@@ -221,8 +222,9 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
                      fourthIconName:nil
                         fourthColor:nil
                          fourthView:nil];
+        [cell setFirstTrigger:0.05f];
     }
-    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }
 
@@ -233,8 +235,9 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
     MCTableViewController *tableViewController = [[MCTableViewController alloc] init];
-    [self.navigationController pushViewController:tableViewController animated:YES];
+//    [self.navigationController pushViewController:tableViewController animated:YES];
 }
 
 #pragma mark - MCSwipeTableViewCellDelegate

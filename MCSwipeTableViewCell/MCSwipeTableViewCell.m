@@ -8,7 +8,7 @@
 
 #import "MCSwipeTableViewCell.h"
 
-static CGFloat const kMCStop1 = 0.25; // Percentage limit to trigger the first action
+static CGFloat const kMCStop1 = 0.25f; // Percentage limit to trigger the first action
 static CGFloat const kMCStop2 = 0.75; // Percentage limit to trigger the second action
 static CGFloat const kMCBounceAmplitude = 20.0; // Maximum bounce amplitude when using the MCSwipeTableViewCellModeSwitch mode
 static NSTimeInterval const kMCBounceDuration1 = 0.2; // Duration of the first part of the bounce animation
@@ -204,7 +204,7 @@ secondStateIconName:(NSString *)secondIconName
                 [self.contentView setCenter:center];
             }
             
-            if (translation.x > 0 && distFromRightEdge > kMCStop1*self.contentView.frame.size.width) {
+            if (translation.x > 0 && distFromRightEdge > _firstTrigger*self.contentView.frame.size.width) {
                 [self moveToOrigin];
             }
         } else {
@@ -251,7 +251,7 @@ secondStateIconName:(NSString *)secondIconName
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
             
-            if (distFromRightEdge > kMCStop1*self.contentView.frame.size.width && distFromRightEdge < _thirdSubview.frame.size.width) { //retract
+            if (distFromRightEdge > _firstTrigger*self.contentView.frame.size.width && distFromRightEdge < _thirdSubview.frame.size.width) { //retract
                 __weak MCSwipeTableViewCell *weakSelf = self;
                                 [self retractWithCompletion:^{
                                     __strong MCSwipeTableViewCell *strongSelf = weakSelf;
@@ -520,30 +520,30 @@ secondStateIconName:(NSString *)secondIconName
     position.y = CGRectGetHeight(self.bounds) / 2.0;
     
     if (isDragging) {
-        if (percentage >= 0 && percentage < kMCStop1) {
-            position.x = [self offsetWithPercentage:(kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+        if (percentage >= 0 && percentage < _firstTrigger) {
+            position.x = [self offsetWithPercentage:(_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
         
-        else if (percentage >= kMCStop1) {
-            position.x = [self offsetWithPercentage:percentage - (kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+        else if (percentage >= _firstTrigger) {
+            position.x = [self offsetWithPercentage:percentage - (_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
         
-        else if (percentage < 0 && percentage >= -kMCStop1) {
-            position.x = CGRectGetWidth(self.bounds) - [self offsetWithPercentage:(kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+        else if (percentage < 0 && percentage >= -_firstTrigger) {
+            position.x = CGRectGetWidth(self.bounds) - [self offsetWithPercentage:(_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
         
-        else if (percentage < -kMCStop1) {
-            position.x = CGRectGetWidth(self.bounds) + [self offsetWithPercentage:percentage + (kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+        else if (percentage < -_firstTrigger) {
+            position.x = CGRectGetWidth(self.bounds) + [self offsetWithPercentage:percentage + (_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
     }
     
     else {
         if (_direction == MCSwipeTableViewCellDirectionRight) {
-            position.x = [self offsetWithPercentage:(kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+            position.x = [self offsetWithPercentage:(_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
         
         else if (_direction == MCSwipeTableViewCellDirectionLeft) {
-            position.x = CGRectGetWidth(self.bounds) - [self offsetWithPercentage:(kMCStop1 / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
+            position.x = CGRectGetWidth(self.bounds) - [self offsetWithPercentage:(_firstTrigger / 2) relativeToWidth:CGRectGetWidth(self.bounds)];
         }
         
         else {
