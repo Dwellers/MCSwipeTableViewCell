@@ -63,10 +63,8 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
 @property (nonatomic, strong) UIColor *thirdColor;
 @property (nonatomic, strong) UIColor *fourthColor;
 
-@property (nonatomic, strong) UIView *firstSubview;
-@property (nonatomic, strong) UIView *secondSubview;
-@property (nonatomic, strong) UIView *thirdSubview;
-@property (nonatomic, strong) UIView *fourthSubview;
+@property (nonatomic, strong) UIView *leftView;
+@property (nonatomic, strong) UIView *rightView;
 
 // Percentage of when the first and second action are activated, respectively
 @property (nonatomic, assign) CGFloat firstTrigger;
@@ -93,29 +91,25 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
     reuseIdentifier:(NSString *)reuseIdentifier
  firstStateIconName:(NSString *)firstIconName
          firstColor:(UIColor *)firstColor
-          firstView:(UIView *)firstView
 secondStateIconName:(NSString *)secondIconName
         secondColor:(UIColor *)secondColor
-         secondView:(UIView *)secondView
       thirdIconName:(NSString *)thirdIconName
          thirdColor:(UIColor *)thirdColor
-          thirdView:(UIView *)thirdView
      fourthIconName:(NSString *)fourthIconName
         fourthColor:(UIColor *)fourthColor
-         fourthView:(UIView *)fourthView;
+           leftView:(UIView *)leftView
+          rightView:(UIView *)rightView;
 
 - (void)setFirstStateIconName:(NSString *)firstIconName
                    firstColor:(UIColor *)firstColor
-                    firstView:(UIView *)firstView
           secondStateIconName:(NSString *)secondIconName
                   secondColor:(UIColor *)secondColor
-                   secondView:(UIView *)secondView
                 thirdIconName:(NSString *)thirdIconName
                    thirdColor:(UIColor *)thirdColor
-                    thirdView:(UIView *)thirdView
                fourthIconName:(NSString *)fourthIconName
                   fourthColor:(UIColor *)fourthColor
-                   fourthView:(UIView *)fourthView;
+                     leftView:(UIView *)leftView
+                    rightView:(UIView *)rightView;
 
 // Manually swipe to origin
 - (void)swipeToOriginWithCompletion:(void(^)(void))completion;

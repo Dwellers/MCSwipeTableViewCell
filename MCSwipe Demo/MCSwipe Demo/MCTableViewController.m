@@ -14,9 +14,7 @@ static NSUInteger const kMCNumItems = 10;
 static CGFloat const TABLE_CELL_HEIGHT = 50;
 
 static CGFloat const FIRST_VIEW_WIDTH = 200;
-static CGFloat const SECOND_VIEW_WIDTH = 300;
-static CGFloat const THIRD_VIEW_WIDTH = 100;
-static CGFloat const FOURTH_VIEW_WIDTH = 300;
+static CGFloat const THIRD_VIEW_WIDTH = 200;
 
 @interface MCTableViewController () <MCSwipeTableViewCellDelegate, UIAlertViewDelegate>
 
@@ -72,29 +70,32 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
     [cell setDelegate:self];
     [cell setFirstStateIconName:@"check.png"
                      firstColor:[UIColor colorWithRed:85.0 / 255.0 green:213.0 / 255.0 blue:80.0 / 255.0 alpha:1.0]
-                      firstView:nil
             secondStateIconName:@"cross.png"
                     secondColor:[UIColor colorWithRed:232.0 / 255.0 green:61.0 / 255.0 blue:14.0 / 255.0 alpha:1.0]
-                     secondView:nil
                   thirdIconName:@"clock.png"
                      thirdColor:[UIColor colorWithRed:254.0 / 255.0 green:217.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]
-                      thirdView:nil
                  fourthIconName:@"list.png"
                     fourthColor:[UIColor colorWithRed:206.0 / 255.0 green:149.0 / 255.0 blue:98.0 / 255.0 alpha:1.0]
-                     fourthView:nil];
-    
+                       leftView:nil
+                      rightView:nil];
     // add some views to test on
-    UIView *firstView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, FIRST_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
-    [firstView setBackgroundColor:[UIColor purpleColor]];
+    UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, FIRST_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
+    [leftView setBackgroundColor:[UIColor purpleColor]];
     
-    UIView *secondView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SECOND_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
-    [secondView setBackgroundColor:[UIColor orangeColor]];
+    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0,0,60,TABLE_CELL_HEIGHT)];
+    [rightView setBackgroundColor:[UIColor cyanColor]];
     
-    UIView *thirdView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-THIRD_VIEW_WIDTH,0,THIRD_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [thirdView setBackgroundColor:[UIColor cyanColor]];
+    UIButton *tapButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 25, 25)];
+    [rightView addSubview:tapButton];
+    NSLog(@"thirdviewframe: %@", NSStringFromCGRect(rightView.frame));
+    NSLog(@"cellframe: %@", NSStringFromCGRect(cell.frame));
+
+    [tapButton setBackgroundColor:[UIColor redColor]];
     
-    UIView *fourthView = [[UIView alloc] initWithFrame:CGRectMake(tableViewCellSize.width-FOURTH_VIEW_WIDTH,0,FOURTH_VIEW_WIDTH,TABLE_CELL_HEIGHT)];
-    [fourthView setBackgroundColor:[UIColor blackColor]];
+    [tapButton addTarget:self action:@selector(thirdViewPressed) forControlEvents:UIControlEventTouchUpInside];
+    
+    [tapButton setCenter:rightView.center];
+    [rightView addSubview:tapButton];
     
     [cell.contentView setBackgroundColor:[UIColor whiteColor]];
     cell.separatorInset = UIEdgeInsetsZero;
@@ -139,16 +140,14 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
         [cell.detailTextLabel setText:@"Swipe"];
         [cell setFirstStateIconName:nil
                          firstColor:nil
-                          firstView:nil
                 secondStateIconName:nil
                         secondColor:nil
-                         secondView:nil
                       thirdIconName:@"clock.png"
                          thirdColor:[UIColor colorWithRed:254.0 / 255.0 green:217.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]
-                          thirdView:nil
                      fourthIconName:@"list.png"
                         fourthColor:[UIColor colorWithRed:206.0 / 255.0 green:149.0 / 255.0 blue:98.0 / 255.0 alpha:1.0]
-                         fourthView:nil];
+                           leftView:nil
+                          rightView:nil];
     }
     
     else if (indexPath.row % kMCNumItems == 5) {
@@ -156,16 +155,15 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
         [cell.detailTextLabel setText:@"Swipe"];
         [cell setFirstStateIconName:@"check.png"
                          firstColor:[UIColor colorWithRed:85.0 / 255.0 green:213.0 / 255.0 blue:80.0 / 255.0 alpha:1.0]
-                          firstView:nil
                 secondStateIconName:@"cross.png"
                         secondColor:[UIColor colorWithRed:232.0 / 255.0 green:61.0 / 255.0 blue:14.0 / 255.0 alpha:1.0]
-                         secondView:nil
                       thirdIconName:nil
                          thirdColor:nil
-                          thirdView:nil
                      fourthIconName:nil
                         fourthColor:nil
-                         fourthView:nil];
+                           leftView:nil
+                          rightView:nil];
+
     }
     
     else if (indexPath.row % kMCNumItems == 6) {
@@ -190,41 +188,35 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
         
         [cell setFirstStateIconName:@"cross.png"
                          firstColor:[UIColor colorWithRed:232.0 / 255.0 green:61.0 / 255.0 blue:14.0 / 255.0 alpha:1.0]
-                          firstView:nil
                 secondStateIconName:nil
                         secondColor:nil
-                         secondView:nil
                       thirdIconName:nil
                          thirdColor:nil
-                          thirdView:nil
                      fourthIconName:nil
                         fourthColor:nil
-                         fourthView:nil];
-        
+                           leftView:nil
+                          rightView:nil];
     }
     
     else if (indexPath.row % kMCNumItems == 9) {
-        
         [cell.textLabel setText:@"Dwellers"];
         [cell.detailTextLabel setText:@"Swipe left returns, right retracts"];
         cell.mode = MCSwipeTableViewCellModeDwellers;
-        //cell.mode = MCSwipeTableViewCellModeSwitch;
         
         [cell setFirstStateIconName:nil
                          firstColor:nil
-                          firstView:firstView
                 secondStateIconName:nil
                         secondColor:nil
-                         secondView:nil
                       thirdIconName:nil
                          thirdColor:nil
-                          thirdView:thirdView
                      fourthIconName:nil
                         fourthColor:nil
-                         fourthView:nil];
-        [cell setFirstTrigger:0.05f];
+                           leftView:leftView
+                          rightView:rightView];
+        
+        cell.firstTrigger = 0.05f;
     }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
     return cell;
 }
 
@@ -232,11 +224,18 @@ static CGFloat const FOURTH_VIEW_WIDTH = 300;
     return TABLE_CELL_HEIGHT;
 }
 
+- (void)thirdViewPressed
+{
+    NSLog(@"tapped on third view");
+}
+
+
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"didSelectRowAtIndexPath: %@", indexPath);
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    MCTableViewController *tableViewController = [[MCTableViewController alloc] init];
+//    MCTableViewController *tableViewController = [[MCTableViewController alloc] init];
 //    [self.navigationController pushViewController:tableViewController animated:YES];
 }
 

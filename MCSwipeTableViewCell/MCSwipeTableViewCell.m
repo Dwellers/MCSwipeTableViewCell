@@ -17,6 +17,9 @@ static NSTimeInterval const kMCDurationLowLimit = 0.25; // Lowest duration when 
 static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration when swiping the cell because we try to simulate velocity
 
 @interface MCSwipeTableViewCell () <UIGestureRecognizerDelegate>
+{
+    UITapGestureRecognizer *_tapGesture;
+}
 
 @property (nonatomic, assign) MCSwipeTableViewCellDirection direction;
 @property (nonatomic, assign) CGFloat currentPercentage;
@@ -60,31 +63,27 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
     reuseIdentifier:(NSString *)reuseIdentifier
  firstStateIconName:(NSString *)firstIconName
          firstColor:(UIColor *)firstColor
-          firstView:(UIView *)firstView
 secondStateIconName:(NSString *)secondIconName
         secondColor:(UIColor *)secondColor
-         secondView:(UIView *)secondView
       thirdIconName:(NSString *)thirdIconName
          thirdColor:(UIColor *)thirdColor
-          thirdView:(UIView *)thirdView
      fourthIconName:(NSString *)fourthIconName
         fourthColor:(UIColor *)fourthColor
-         fourthView:(UIView *)fourthView {
+           leftView:(UIView *)leftView
+          rightView:(UIView *)rightView {
     
     self = [self initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         [self setFirstStateIconName:firstIconName
                          firstColor:firstColor
-                          firstView:firstView
                 secondStateIconName:secondIconName
                         secondColor:secondColor
-                         secondView:secondView
                       thirdIconName:thirdIconName
                          thirdColor:thirdColor
-                          thirdView:thirdView
                      fourthIconName:fourthIconName
                         fourthColor:fourthColor
-                         fourthView:fourthView];
+                           leftView:leftView
+                          rightView:rightView];
     }
     return self;
 }
@@ -105,6 +104,10 @@ secondStateIconName:(NSString *)secondIconName
     _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureRecognizer:)];
     [self addGestureRecognizer:_panGestureRecognizer];
     [_panGestureRecognizer setDelegate:self];
+    
+    _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGestureRecognizer:)];
+    [self addGestureRecognizer:_tapGesture];
+    [_tapGesture setDelegate:self];
     
     _isDragging = NO;
     
@@ -129,16 +132,14 @@ secondStateIconName:(NSString *)secondIconName
 
 - (void)setFirstStateIconName:(NSString *)firstIconName
                    firstColor:(UIColor *)firstColor
-                    firstView:(UIView *)firstView
           secondStateIconName:(NSString *)secondIconName
                   secondColor:(UIColor *)secondColor
-                   secondView:(UIView *)secondView
                 thirdIconName:(NSString *)thirdIconName
                    thirdColor:(UIColor *)thirdColor
-                    thirdView:(UIView *)thirdView
                fourthIconName:(NSString *)fourthIconName
                   fourthColor:(UIColor *)fourthColor
-                   fourthView:(UIView *)fourthView {
+                     leftView:(UIView *)leftView
+                    rightView:(UIView *)rightView {
     
     [self setFirstIconName:firstIconName];
     [self setSecondIconName:secondIconName];
@@ -150,10 +151,34 @@ secondStateIconName:(NSString *)secondIconName
     [self setThirdColor:thirdColor];
     [self setFourthColor:fourthColor];
     
-    [self setFirstSubview:firstView];
-    [self setSecondSubview:secondView];
-    [self setThirdSubview:thirdView];
-    [self setFourthSubview:fourthView];
+    [self setLeftView:leftView];
+    [self setRightView:rightView];
+}
+
+- (void) setLeftView:(UIView *)leftView
+{
+    [_leftView removeFromSuperview];
+    
+    _leftView = leftView;
+//    
+//    _leftView.frame = CGRectMake(0,
+//                                     0,
+//                                     _leftView.frame.size.width,
+//                                     self.frame.size.height);
+    [_colorIndicatorView addSubview:_leftView];
+}
+
+- (void) setRightView:(UIView *)rightView
+{
+    [_rightView removeFromSuperview];
+    
+    _rightView = rightView;
+    
+    _rightView.frame = CGRectMake(_colorIndicatorView.frame.size.width - _rightView.frame.size.width,
+                                     0,
+                                     _rightView.frame.size.width,
+                                  _rightView.frame.size.height);
+    [_colorIndicatorView addSubview:_rightView];
 }
 
 #pragma mark - Prepare reuse
@@ -198,9 +223,9 @@ secondStateIconName:(NSString *)secondIconName
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
             CGFloat distFromLeftEdge = center.x-self.contentView.frame.size.width/2;
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
-            if (distFromLeftEdge < _firstSubview.bounds.size.width && translation.x > 0) {
+            if (distFromLeftEdge < _leftView.bounds.size.width && translation.x > 0) {
                 [self.contentView setCenter:center];
-            } else if (translation.x < 0 && distFromRightEdge < _thirdSubview.frame.size.width) { //first 25% from right
+            } else if (translation.x < 0 && distFromRightEdge < _rightView.frame.size.width) { //first 25% from right
                 [self.contentView setCenter:center];
             }
             
@@ -251,7 +276,7 @@ secondStateIconName:(NSString *)secondIconName
             CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
             CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
             
-            if (distFromRightEdge > _firstTrigger*self.contentView.frame.size.width && distFromRightEdge < _thirdSubview.frame.size.width) { //retract
+            if (distFromRightEdge > _firstTrigger*self.contentView.frame.size.width && distFromRightEdge < _rightView.frame.size.width) { //retract
                 __weak MCSwipeTableViewCell *weakSelf = self;
                                 [self retractWithCompletion:^{
                                     __strong MCSwipeTableViewCell *strongSelf = weakSelf;
@@ -269,7 +294,7 @@ secondStateIconName:(NSString *)secondIconName
 - (void)retractWithCompletion:(void(^)(void))completion {
     [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
         CGPoint center = self.contentView.center;
-        center.x = self.contentView.frame.size.width/2-_thirdSubview.bounds.size.width;
+        center.x = self.contentView.frame.size.width/2-_rightView.bounds.size.width;
         [self.contentView setCenter:center];
         
         [_slidingImageView setAlpha:0.0];
@@ -298,6 +323,13 @@ secondStateIconName:(NSString *)secondIconName
     }];
 }
 
+#pragma mark - HandleTapGestureRecognizer
+- (void) handleTapGestureRecognizer: (UITapGestureRecognizer *) tapGesture
+{
+    [self moveToOrigin];
+
+}
+
 #pragma mark - UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if ([gestureRecognizer class] == [UIPanGestureRecognizer class]) {
@@ -306,10 +338,10 @@ secondStateIconName:(NSString *)secondIconName
         CGPoint point = [g velocityInView:self];
         
         if (fabsf(point.x) > fabsf(point.y) ) {
-            if (point.x < 0 && !_thirdSubview && !_thirdColor && !_thirdIconName && !_fourthSubview && !_fourthColor && !_fourthIconName){
+            if (point.x < 0 && !_rightView && !_thirdColor && !_thirdIconName && !_fourthColor && !_fourthIconName){
                 return NO;
             }
-            if (point.x > 0 && !_firstSubview && !_firstColor && !_firstIconName && !_secondSubview && !_secondColor && !_secondIconName){
+            if (point.x > 0 && !_leftView && !_firstColor && !_firstIconName && !_secondColor && !_secondIconName){
                 return NO;
             }
             // We notify the delegate that we just started dragging
@@ -318,6 +350,12 @@ secondStateIconName:(NSString *)secondIconName
             }
             
             return YES;
+        }
+    } else if([gestureRecognizer class] == [UITapGestureRecognizer class]) {
+        
+        if(self.mode == MCSwipeTableViewCellModeDwellers) {
+            
+            return self.contentView.frame.origin.x != 0;
         }
     }
     return NO;
@@ -463,22 +501,33 @@ secondStateIconName:(NSString *)secondIconName
 }
 
 - (UIView*) findCurrentSubview:(CGFloat)percentage {
-    UIView *subview = nil;
+//    UIView *subview = nil;
+//    
+//    // Background Color
+//    if (percentage >= _firstTrigger && percentage < _secondTrigger)
+//        subview = _firstSubview;
+//    else if (percentage >= _secondTrigger)
+//        subview =_secondSubview;
+//    else if (percentage < -_firstTrigger && percentage > -_secondTrigger)
+//        subview = _thirdSubview;
+//    else if (percentage <= -_secondTrigger)
+//        subview = _fourthSubview;
+//    else {
+//        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+//    }
+//    
+//    return subview;
     
-    // Background Color
-    if (percentage >= _firstTrigger && percentage < _secondTrigger)
-        subview = _firstSubview;
-    else if (percentage >= _secondTrigger)
-        subview =_secondSubview;
-    else if (percentage < -_firstTrigger && percentage > -_secondTrigger)
-        subview = _thirdSubview;
-    else if (percentage <= -_secondTrigger)
-        subview = _fourthSubview;
-    else {
-        [[_colorIndicatorView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    if(percentage > 0) { // left view
+        
+        return _leftView;
+        
+    } else if(percentage < 0) { // right view
+     
+        return _rightView;
     }
     
-    return subview;
+    return nil;
 }
 
 #pragma mark - Movement
@@ -504,7 +553,7 @@ secondStateIconName:(NSString *)secondIconName
     
     UIView *subview = [self findCurrentSubview:percentage];
     if (subview != nil) {
-        [_colorIndicatorView addSubview:subview];
+        [_colorIndicatorView bringSubviewToFront:subview];
     }
 }
 
