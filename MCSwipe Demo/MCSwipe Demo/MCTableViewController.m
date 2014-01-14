@@ -82,13 +82,15 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
     UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, FIRST_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
     [leftView setBackgroundColor:[UIColor purpleColor]];
     
-    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0,0,60,TABLE_CELL_HEIGHT)];
+    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0,0, 80,TABLE_CELL_HEIGHT)];
     [rightView setBackgroundColor:[UIColor cyanColor]];
+    [rightView.layer setBorderWidth:1.0f];
+    [rightView.layer setBorderColor:[UIColor yellowColor].CGColor];
+    
+    
     
     UIButton *tapButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 25, 25)];
     [rightView addSubview:tapButton];
-    NSLog(@"thirdviewframe: %@", NSStringFromCGRect(rightView.frame));
-    NSLog(@"cellframe: %@", NSStringFromCGRect(cell.frame));
 
     [tapButton setBackgroundColor:[UIColor redColor]];
     
@@ -202,9 +204,10 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
         [cell.textLabel setText:@"Dwellers"];
         [cell.detailTextLabel setText:@"Swipe left returns, right retracts"];
         cell.mode = MCSwipeTableViewCellModeDwellers;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        [cell setFirstStateIconName:nil
-                         firstColor:nil
+        [cell setFirstStateIconName:@"check.png"
+                         firstColor:[UIColor redColor]
                 secondStateIconName:nil
                         secondColor:nil
                       thirdIconName:nil
@@ -216,6 +219,9 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
         
         cell.firstTrigger = 0.05f;
     }
+    
+    NSLog(@"thirdviewframe: %@", NSStringFromCGRect(rightView.frame));
+    NSLog(@"cellframe     : %@", NSStringFromCGRect(cell.bounds));
     
     return cell;
 }
