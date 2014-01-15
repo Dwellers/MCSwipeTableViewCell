@@ -29,7 +29,6 @@ static NSTimeInterval const kMCDurationHightLimit = 0.1; // Highest duration whe
 @property (nonatomic, strong) NSString *currentImageName;
 @property (nonatomic, strong) UIView *colorIndicatorView;
 @property (nonatomic, strong) UIView *rightCoverView;
-@property (nonatomic, strong) UIView *leftCoverView;
 
 @end
 
@@ -71,7 +70,6 @@ secondStateIconName:(NSString *)secondIconName
          thirdColor:(UIColor *)thirdColor
      fourthIconName:(NSString *)fourthIconName
         fourthColor:(UIColor *)fourthColor
-           leftView:(UIView *)leftView
           rightView:(UIView *)rightView {
     
     self = [self initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -84,7 +82,6 @@ secondStateIconName:(NSString *)secondIconName
                          thirdColor:thirdColor
                      fourthIconName:fourthIconName
                         fourthColor:fourthColor
-                           leftView:leftView
                           rightView:rightView];
     }
     return self;
@@ -134,17 +131,11 @@ secondStateIconName:(NSString *)secondIconName
 {
     [super layoutSubviews];
     
-    _leftView.frame = CGRectMake(0,
-                                 0,
-                                 _leftView.frame.size.width,
-                                 _leftView.frame.size.height);
-    
     _rightView.frame = CGRectMake(_colorIndicatorView.frame.size.width - _rightView.frame.size.width,
                                   0,
                                   _rightView.frame.size.width,
                                   _rightView.frame.size.height);
     
-    _leftCoverView.frame = _leftView.frame;
     _rightCoverView.frame = _rightView.frame;
 
 }
@@ -159,7 +150,6 @@ secondStateIconName:(NSString *)secondIconName
                    thirdColor:(UIColor *)thirdColor
                fourthIconName:(NSString *)fourthIconName
                   fourthColor:(UIColor *)fourthColor
-                     leftView:(UIView *)leftView
                     rightView:(UIView *)rightView {
     
     [self setFirstIconName:firstIconName];
@@ -172,24 +162,7 @@ secondStateIconName:(NSString *)secondIconName
     [self setThirdColor:thirdColor];
     [self setFourthColor:fourthColor];
     
-    [self setLeftView:leftView];
     [self setRightView:rightView];
-}
-
-- (void) setLeftView:(UIView *)leftView
-{
-    [_leftView removeFromSuperview];
-    
-    _leftView = leftView;
-    
-    [_colorIndicatorView addSubview:_leftView]; //frame set in layoutSubviews
-    
-    if(!_leftCoverView) {
-        _leftCoverView = [[UIView alloc] init];
-    }
-    _leftCoverView.backgroundColor = self.defaultColor ? self.defaultColor : [UIColor grayColor];
-    
-    [_colorIndicatorView addSubview:_leftCoverView];
 }
 
 - (void) setRightView:(UIView *)rightView
@@ -200,13 +173,6 @@ secondStateIconName:(NSString *)secondIconName
     
     [_colorIndicatorView addSubview:_rightView];
 
-    if(!_rightCoverView) {
-        _rightCoverView = [[UIView alloc] init]; //frame set in layoutSubviews
-    }
-    
-    _rightCoverView.backgroundColor = self.defaultColor ? self.defaultColor : [UIColor grayColor];
-    
-    [_colorIndicatorView addSubview:_rightCoverView];
 }
 
 #pragma mark - Prepare reuse
@@ -241,6 +207,9 @@ secondStateIconName:(NSString *)secondIconName
     CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
     CGPoint velocity = [gesture velocityInView:self];
     CGFloat percentage = [self percentageWithOffset:CGRectGetMinX(self.contentView.frame) relativeToWidth:CGRectGetWidth(self.bounds)];
+    
+    CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
+    
     NSTimeInterval animationDuration = [self animationDurationWithVelocity:velocity];
     _direction = [self directionWithPercentage:percentage];
     
@@ -249,17 +218,16 @@ secondStateIconName:(NSString *)secondIconName
         
         if (self.mode == MCSwipeTableViewCellModeDwellers) {//dwellers: can move only as much as the subview allow
 
-            CGFloat distFromLeftEdge = center.x-self.contentView.frame.size.width/2;
-            CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
-            if (distFromLeftEdge < _leftView.bounds.size.width && translation.x > 0) {
+
+            if (distFromRightEdge < _rightView.frame.size.width) { // don't swipe past revealed view width
+                _rightView.alpha = 1.0f;
+                
                 [self.contentView setCenter:center];
-            } else if (translation.x < 0 && distFromRightEdge < _rightView.frame.size.width) { //first 25% from right
-                [self.contentView setCenter:center];
+            }
+            if(_direction == MCSwipeTableViewCellDirectionRight) {
+                _rightView.alpha = 0.0f;
             }
             
-            if (translation.x > 0 && distFromRightEdge > _firstTrigger*self.contentView.frame.size.width) {
-                [self moveToOrigin];
-            }
         } else {
             [self.contentView setCenter:center]; //allows you to move the outside cell
         }
@@ -301,20 +269,16 @@ secondStateIconName:(NSString *)secondIconName
             
             [self moveWithDuration:animationDuration andDirection:_direction];
             
-        } else if (cellMode == MCSwipeTableViewCellModeDwellers) {
-            CGPoint center = {self.contentView.center.x + translation.x, self.contentView.center.y};
-            CGFloat distFromRightEdge = self.contentView.frame.size.width/2-center.x;
+        } else if (cellMode == MCSwipeTableViewCellModeDwellers && velocity.x < 0 && [self didTriggerRetraction]) {
             
-            if (distFromRightEdge > _firstTrigger*self.contentView.frame.size.width && distFromRightEdge < _rightView.frame.size.width) { //retract
-                __weak MCSwipeTableViewCell *weakSelf = self;
-                                [self retractWithCompletion:^{
-                                    __strong MCSwipeTableViewCell *strongSelf = weakSelf;
-                                    [strongSelf notifyDelegate];
-                                }];
-            } else {
-                [self moveToOrigin];
-            }
+            __weak MCSwipeTableViewCell *weakSelf = self;
+            [self retractWithCompletion:^{
+                __strong MCSwipeTableViewCell *strongSelf = weakSelf;
+                [strongSelf notifyDelegate];
+            }];
+            
         } else {
+            
             [self moveToOrigin];
         }
     }
@@ -370,7 +334,7 @@ secondStateIconName:(NSString *)secondIconName
             if (point.x < 0 && !_rightView && !_thirdColor && !_thirdIconName && !_fourthColor && !_fourthIconName){
                 return NO;
             }
-            if (point.x > 0 && !_leftView && !_firstColor && !_firstIconName && !_secondColor && !_secondIconName){
+            if (point.x > 0 && !_firstColor && !_firstIconName && !_secondColor && !_secondIconName){
                 return NO;
             }
             // We notify the delegate that we just started dragging
@@ -529,33 +493,10 @@ secondStateIconName:(NSString *)secondIconName
     return isValid;
 }
 
-- (UIView*) findCurrentSubview:(CGFloat)percentage
+- (BOOL) didTriggerRetraction
 {
-    
-    if(percentage > 0) { // left view
-        
-        return _leftView;
-        
-    } else if(percentage < 0) { // right view
-     
-        return _rightView;
-    }
-    
-    return nil;
-}
-
-- (void) coverUnusedView:(CGFloat)percentage
-{
-    if(percentage > 0) {
-        
-        [_colorIndicatorView bringSubviewToFront:_rightCoverView];
-        [_colorIndicatorView sendSubviewToBack:_leftCoverView];
-        
-    } else if(percentage < 0) {
-        
-        [_colorIndicatorView bringSubviewToFront:_leftCoverView];
-        [_colorIndicatorView sendSubviewToBack:_rightCoverView];
-    }
+    return self.contentView.frame.origin.x < 0 &&
+           fabs(self.contentView.frame.origin.x) >= _firstTrigger*self.contentView.frame.size.width;
 }
 
 #pragma mark - Movement
@@ -577,13 +518,6 @@ secondStateIconName:(NSString *)secondIconName
     UIColor *color = [self colorWithPercentage:percentage];
     if (color != nil) {
         [_colorIndicatorView setBackgroundColor:color];
-    }
-    
-    UIView *subview = [self findCurrentSubview:percentage];
-    if (subview != nil) {
-        [_colorIndicatorView bringSubviewToFront:subview];
-        
-        [self coverUnusedView:percentage];
     }
 }
 

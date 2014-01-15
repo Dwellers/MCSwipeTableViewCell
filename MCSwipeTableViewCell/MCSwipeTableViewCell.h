@@ -63,7 +63,6 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellMode) {
 @property (nonatomic, strong) UIColor *thirdColor;
 @property (nonatomic, strong) UIColor *fourthColor;
 
-@property (nonatomic, strong) UIView *leftView;
 @property (nonatomic, strong) UIView *rightView;
 
 // Percentage of when the first and second action are activated, respectively
@@ -97,7 +96,6 @@ secondStateIconName:(NSString *)secondIconName
          thirdColor:(UIColor *)thirdColor
      fourthIconName:(NSString *)fourthIconName
         fourthColor:(UIColor *)fourthColor
-           leftView:(UIView *)leftView
           rightView:(UIView *)rightView;
 
 - (void)setFirstStateIconName:(NSString *)firstIconName
@@ -108,7 +106,6 @@ secondStateIconName:(NSString *)secondIconName
                    thirdColor:(UIColor *)thirdColor
                fourthIconName:(NSString *)fourthIconName
                   fourthColor:(UIColor *)fourthColor
-                     leftView:(UIView *)leftView
                     rightView:(UIView *)rightView;
 
 // Manually swipe to origin

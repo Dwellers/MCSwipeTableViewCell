@@ -76,13 +76,12 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
                      thirdColor:[UIColor colorWithRed:254.0 / 255.0 green:217.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]
                  fourthIconName:@"list.png"
                     fourthColor:[UIColor colorWithRed:206.0 / 255.0 green:149.0 / 255.0 blue:98.0 / 255.0 alpha:1.0]
-                       leftView:nil
                       rightView:nil];
     // add some views to test on
     UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, FIRST_VIEW_WIDTH, TABLE_CELL_HEIGHT)];
     [leftView setBackgroundColor:[UIColor purpleColor]];
     
-    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0,0, 80,TABLE_CELL_HEIGHT)];
+    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(0,0, 100,TABLE_CELL_HEIGHT)];
     [rightView setBackgroundColor:[UIColor cyanColor]];
     [rightView.layer setBorderWidth:1.0f];
     [rightView.layer setBorderColor:[UIColor yellowColor].CGColor];
@@ -148,7 +147,6 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
                          thirdColor:[UIColor colorWithRed:254.0 / 255.0 green:217.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]
                      fourthIconName:@"list.png"
                         fourthColor:[UIColor colorWithRed:206.0 / 255.0 green:149.0 / 255.0 blue:98.0 / 255.0 alpha:1.0]
-                           leftView:nil
                           rightView:nil];
     }
     
@@ -163,7 +161,6 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
                          thirdColor:nil
                      fourthIconName:nil
                         fourthColor:nil
-                           leftView:nil
                           rightView:nil];
 
     }
@@ -196,7 +193,6 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
                          thirdColor:nil
                      fourthIconName:nil
                         fourthColor:nil
-                           leftView:nil
                           rightView:nil];
     }
     
@@ -214,10 +210,9 @@ static CGFloat const THIRD_VIEW_WIDTH = 200;
                          thirdColor:nil
                      fourthIconName:nil
                         fourthColor:nil
-                           leftView:leftView
                           rightView:rightView];
         
-        cell.firstTrigger = 0.05f;
+        cell.firstTrigger = 0.10f;
     }
     
     NSLog(@"thirdviewframe: %@", NSStringFromCGRect(rightView.frame));
